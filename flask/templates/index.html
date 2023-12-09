@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Image Captioning</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	
+
+<style type="text/css">
+	
+
+.jumbotron img {
+	max-width: 100%; 
+	height: auto; 
+	display: block; 
+	margin: 0 auto; 
+	padding: 20px 0; 
+}
+#image{
+	height: 90%;
+	width: 50%;
+	padding-top: 2%;
+}
+.text{
+	font-size: 32px;
+	font-style: italic;
+}
+.jumbotron {
+    padding: 2rem 0; 
+    margin-bottom: 0; 
+    background-color: #000000;
+    border-radius: 0;
+    width: 100vw; 
+    max-width: 100%;
+    box-sizing: border-box; 
+}
+.btn-primary {
+    color: #fff;
+    background-color: #000;
+    border-color: #212529;
+    margin: 10px;
+}
+.btn-primary:hover {
+    color: #fff;
+    background-color: #78c6a7;
+    border-color: #78c6a7;
+}
+.form-control {
+    display: block;
+    width: 100%;
+    height: calc(1.5em + 0.75rem + 2px);
+    padding: 0.15rem 0.25rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+#caption {
+    font-size: 20px;
+    font-weight: 900;
+	margin-top: 1rem;
+    margin-bottom: 2rem;
+}
+</style>
+</style>
+
+</head>
+<body>
+	<div class="container">
+		<div class="jumbotron ">
+	        <div class="container">
+				<img src="{{ url_for('static', filename='echoeyeslogo1.png') }}" alt="EchoEyes Logo" />
+	        </div>
+	    </div>
+	
+	
+
+		<form class="form-inline" enctype="multipart/form-data" action="/generate_caption" method="POST">
+	        <label><b>Put Your Image: &nbsp;&nbsp; </b></label>
+	        <input type="file" class="form-control" name="image">
+	        <button type="submit" class="btn btn-primary"> Submit</button>
+	    </form>
+		<p id="caption"></p>
+		<audio id="caption-audio" controls style="display:none;">
+			<source src="" type="audio/mpeg">
+		</audio>
+		<img id="image">
+		<script>
+			// JavaScript code to update the generated caption and display the uploaded image
+			document.querySelector('form').addEventListener('submit', function (e) {
+				e.preventDefault();
+				const formData = new FormData(this);
+				fetch('/generate_caption', {
+					method: 'POST',
+					body: formData
+				})
+				.then(response => response.json())
+				.then(data => {
+					//console.log(data); //打印响应数据以进行调试
+					document.getElementById('caption').textContent = data.caption;
+					
+					 // 更新音頻元素的src屬性並顯示播放器
+					 var audioPlayer = document.getElementById('caption-audio');
+					 audioPlayer.src = data.audio_path;
+					 audioPlayer.style.display = 'block';
+					 audioPlayer.load();
+					document.getElementById('image').src = URL.createObjectURL(formData.get('image'));
+
+					
+				});
+			});
+		</script>
+		
+
+	    {% if results %}
+	    	<div class="row">
+	    		<div class="col-sm-4">
+	    			<img src="{{results.image}}">
+	    		</div>
+	    		<div class="col-sm-8">
+
+	    			<p class="text">Generated Caption : </p>
+	    			<p><b> {{results.description}} </b> </p>
+	    		</div>
+	    {% endif %}
+
+	</div>
+
+
+
+
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+</body>
+</html>
